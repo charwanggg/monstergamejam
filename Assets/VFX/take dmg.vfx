@@ -50,9 +50,9 @@ MonoBehaviour:
   uiBounds:
     serializedVersion: 2
     x: 478
-    y: -1435
+    y: -1436
     width: 848
-    height: 2774
+    height: 2750
 --- !u!114 &114350483966674976
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1236,7 +1236,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEditor.VFX.TArcCircle, Unity.VisualEffectGraph.Editor,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"circle":{"transform":{"position":{"x":0.0,"y":0.0,"z":0.0},"angles":{"x":0.0,"y":0.0,"z":0.0},"scale":{"x":1.0,"y":1.0,"z":1.0}},"radius":2.0},"arc":6.2831854820251469}'
+      m_SerializableObject: '{"circle":{"transform":{"position":{"x":-6.263908289838582e-7,"y":-0.06467907875776291,"z":0.5970631837844849},"angles":{"x":0.0,"y":0.0,"z":0.0},"scale":{"x":1.0,"y":1.0,"z":1.0}},"radius":2.0},"arc":6.2831854820251469}'
     m_Space: 0
   m_Property:
     name: arcCircle
@@ -1841,7 +1841,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEditor.VFX.Sphere, Unity.VisualEffectGraph.Editor,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"center":{"x":-0.12830209732055665,"y":0.5750460624694824,"z":-12.25497817993164},"radius":4.0}'
+      m_SerializableObject: '{"center":{"x":3.743032693862915,"y":18.594003677368165,"z":16.563814163208009},"radius":4.0}'
     m_Space: 1
   m_Property:
     name: Sphere
