@@ -4,13 +4,14 @@ using Unity.AI.Navigation;
 using System.Collections;
 using System.Linq;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class MazeMaker : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private static MazeMaker instance;
     public static MazeMaker Instance { get { return instance; } }
-    
+
     public int width = 10;
     public int length = 10;
     [SerializeField] private float cellSize = 4f;
@@ -30,13 +31,14 @@ public class MazeMaker : MonoBehaviour
     private List<int>[] path;
     private bool[] visited;
     [SerializeField] private int numRituals;
+    [SerializeField] private TextMeshProUGUI scoreText;
     private float pts;
 
     private List<GameObject> enemies;
     void Awake()
     {
         instance = this;
-    } 
+    }
     void Start()
     {
         adjacency = new List<int>[width * length];
@@ -83,7 +85,8 @@ public class MazeMaker : MonoBehaviour
         visited[start] = true;
         DFS(start);
 
-        for (int i = 0; i < numRituals; i++) {
+        for (int i = 0; i < numRituals; i++)
+        {
             int r = Random.Range(0, width * length);
             Vector3 ritualPos = GetCellLocation(r);
             RitualPositions.Add(ritualPos);
@@ -91,7 +94,8 @@ public class MazeMaker : MonoBehaviour
         }
         StartCoroutine(startNavMeshBake());
     }
-    private IEnumerator startNavMeshBake() {
+    private IEnumerator startNavMeshBake()
+    {
         yield return new WaitForEndOfFrame();
         nms.BuildNavMesh();
 
@@ -118,7 +122,8 @@ public class MazeMaker : MonoBehaviour
         Quaternion wallRot = Quaternion.LookRotation(direction);
         Vector2 v = new Vector2(Mathf.Max(a, b), Mathf.Min(a, b));
 
-        if (!walls.ContainsKey(v)) {
+        if (!walls.ContainsKey(v))
+        {
             GameObject wallPrefab = wallPrefabs[Random.Range(0, wallPrefabs.Length - 1)];
             GameObject wall = Instantiate(wallPrefab, wallPos, wallRot, this.transform);
             walls.Add(v, wall);
@@ -130,6 +135,7 @@ public class MazeMaker : MonoBehaviour
     void Update()
     {
         bool isAllNull = true;
+        pts += Time.unscaledDeltaTime;
         if (enemies != null)
         {
             foreach (GameObject g in enemies)
@@ -155,7 +161,7 @@ public class MazeMaker : MonoBehaviour
             nextWave = Time.time + waveTimer;
         }
     }
-    
+
     void SpawnWave(int num)
     {
         for (int i = 0; i < num; i++)
@@ -165,28 +171,6 @@ public class MazeMaker : MonoBehaviour
             enemies.Add(en);
         }
     }
-
-    // void Win()
-    // {
-    //     Debug.Log("YOU WIN");
-    //     StartCoroutine(WinCoroutine());
-    // }
-
-    // private IEnumerator WinCoroutine()
-    // {
-    //     Sinner.instance.enabled = false;
-    //     Sinner.instance.gameObject.GetComponent<PlayerMovement>().enabled = false;
-    //     Time.timeScale = 0.5f;
-    //     float time = 0f;
-    //     loseCanvasGroup.gameObject.SetActive(true);
-    //     while (time < 1)
-    //     {
-    //         loseCanvasGroup.alpha = Mathf.Lerp(0f, 1f, time);
-    //         time += Time.deltaTime;
-    //         yield return null;
-    //     }
-    //     loseCanvasGroup.alpha = 1f;
-    // }
     public void AddPoints(int p)
     {
         pts += p;
@@ -196,13 +180,15 @@ public class MazeMaker : MonoBehaviour
     {
         Debug.Log("YOU LOSE");
         StartCoroutine(LoseCoroutine());
+        
     }
-    
+
     private IEnumerator LoseCoroutine()
     {
         Sinner.instance.enabled = false;
         Sinner.instance.gameObject.GetComponent<PlayerMovement>().enabled = false;
         Time.timeScale = 0.5f;
+        scoreText.text = "Score: " + ((int) pts); 
         float time = 0f;
         loseCanvasGroup.gameObject.SetActive(true);
         while (time < 1)
@@ -212,7 +198,7 @@ public class MazeMaker : MonoBehaviour
             yield return null;
         }
         loseCanvasGroup.alpha = 1f;
-        SceneManager.LoadSceneAsync(0);
+        SceneManager.LoadSceneAsync("menu");
     }
     private Vector2Int RandomOnEdge()
     {
@@ -245,15 +231,18 @@ public class MazeMaker : MonoBehaviour
         return new Vector2Int(x, y);
     }
 
-    private void RemoveWall(int a, int b) {
+    private void RemoveWall(int a, int b)
+    {
         Vector2 key = new Vector2(Mathf.Max(a, b), Mathf.Min(a, b));
-        if (walls.ContainsKey(key)) {
+        if (walls.ContainsKey(key))
+        {
             Destroy(walls[key]);
             walls.Remove(key);
-        } 
+        }
     }
 
-    public Vector3 GetCellLocation(int ind) {
+    public Vector3 GetCellLocation(int ind)
+    {
         int i = ind / length;
         int j = ind % length;
         float x = topLeft.position.x + cellSize * i;
@@ -261,11 +250,14 @@ public class MazeMaker : MonoBehaviour
         return new Vector3(x, 0f, z);
     }
 
-    private void DFS(int vert) {
+    private void DFS(int vert)
+    {
         ListExtensions.Shuffle(adjacency[vert]);
-        for (int n = 0; n < adjacency[vert].Count; n++) {
+        for (int n = 0; n < adjacency[vert].Count; n++)
+        {
             int neighbor = adjacency[vert][n];
-            if (!visited[neighbor]) {
+            if (!visited[neighbor])
+            {
                 visited[neighbor] = true;
                 path[vert].Add(neighbor);
                 //path[neighbor].Add(vert);
