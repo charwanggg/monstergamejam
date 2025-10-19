@@ -20,7 +20,9 @@ public class HP : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        OnTakeDamage?.Invoke(damage);
         currHP -= damage;
+        Debug.Log("TOOK DAMAGE");
         if (currHP <= 0)
         {
             Die();
