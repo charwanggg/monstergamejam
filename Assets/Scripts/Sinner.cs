@@ -20,6 +20,7 @@ public class Sinner : MonoBehaviour
     [SerializeField] private Animator rightArmAnim;
     [SerializeField] private Collider clawCollider;
     [SerializeField] private ParticleSystem lightning;
+    [SerializeField] private HP hp;
     public bool canChannel;
 
 
@@ -35,6 +36,18 @@ public class Sinner : MonoBehaviour
             vfx.enabled = false;
         }
         clawCollider.GetComponent<HitBox>().owner = this.gameObject;
+        hp.OnDie += Die;
+        hp.OnTakeDamage +=(a) => OnTakeDamage(a);
+    }
+
+    void Die()
+    {
+
+    }
+    
+    void OnTakeDamage(int damage)
+    {
+        HitPause.Instance.HitStop(.1f);
     }
 
     // Update is called once per frame
@@ -69,7 +82,7 @@ public class Sinner : MonoBehaviour
     {
         float currTime = 0f;
         
-        while (currTime < 2f)
+        while (currTime < 1.5f)
         {
             if (canChannel && Input.GetMouseButton(1))
             {
@@ -79,8 +92,8 @@ public class Sinner : MonoBehaviour
             else
             {
                 Debug.Log("Channel Interrupted");
-                leftArmAnim.SetTrigger("backToIdle");
-                rightArmAnim.SetTrigger("backToIdle");
+                leftArmAnim.SetTrigger("BackToIdle");
+                rightArmAnim.SetTrigger("BackToIdle");
                 channelCoroutine = null;
                 yield break;
             }

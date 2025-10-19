@@ -101,6 +101,7 @@ MonoBehaviour:
   rightArmAnim: {fileID: 1388779871628025822}
   clawCollider: {fileID: 3276066255560282319}
   lightning: {fileID: 3198969273018371869}
+  hp: {fileID: 2649305773779333695}
   canChannel: 0
   clawCD: 2
 --- !u!114 &2649305773779333695

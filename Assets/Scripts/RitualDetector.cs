@@ -20,11 +20,39 @@ public class RitualDetector : MonoBehaviour
     {
         if (other.tag == "Ritual")
         {
+            RitualSpot ritual = other.GetComponentInParent<RitualSpot>();
             Debug.Log("Ritual Detected");
-            ritualsInRange.Add(other.gameObject);
-            sinner.canChannel = true;
+            if (!ritual.isExhausted)
+            {
+                ritualsInRange.Add(other.gameObject);
+                sinner.canChannel = true;
+            }
         }
-        
+
+    }
+    
+    void OnTriggerStay(Collider other)
+    {
+        if (other.tag == "Ritual")
+        {
+            RitualSpot ritual = other.GetComponentInParent<RitualSpot>();
+            if (!ritual.isExhausted)
+            {
+                if (!ritualsInRange.Contains(other.gameObject))
+                {
+                    ritualsInRange.Add(other.gameObject);
+                }
+                sinner.canChannel = true;
+            }
+            else
+            {
+                ritualsInRange.Remove(other.gameObject);
+                if (ritualsInRange.Count == 0)
+                {
+                    sinner.canChannel = false;
+                }
+            }
+        }
     }
     void OnTriggerExit(Collider other)
     {
