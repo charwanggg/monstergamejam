@@ -14,7 +14,7 @@ public class MazeMaker : MonoBehaviour
     [SerializeField] private float cellSize = 4f;
     [SerializeField] private float density = 0.2f;
     [SerializeField] private Transform topLeft;
-    [SerializeField] private GameObject wallPrefab;
+    [SerializeField] private GameObject[] wallPrefabs;
     [SerializeField] private NavMeshSurface nms;
     [SerializeField] private GameObject Ritual;
     public List<Vector3> RitualPositions = new List<Vector3>();
@@ -97,6 +97,7 @@ public class MazeMaker : MonoBehaviour
         Quaternion wallRot = Quaternion.LookRotation(direction);
         Vector2 v = new Vector2(Mathf.Max(a, b), Mathf.Min(a, b));
         if (!walls.ContainsKey(v)) {
+            GameObject wallPrefab = wallPrefabs[Random.Range(0, wallPrefabs.Length - 1)];
             GameObject wall = Instantiate(wallPrefab, wallPos, wallRot, this.transform);
             walls.Add(v, wall);
         }
