@@ -51,8 +51,8 @@ MonoBehaviour:
     serializedVersion: 2
     x: 478
     y: -1436
-    width: 848
-    height: 2750
+    width: 850
+    height: 2789
 --- !u!114 &114350483966674976
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1841,7 +1841,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEditor.VFX.Sphere, Unity.VisualEffectGraph.Editor,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"center":{"x":3.743032693862915,"y":18.594003677368165,"z":16.563814163208009},"radius":4.0}'
+      m_SerializableObject: '{"center":{"x":328.0,"y":-282.0,"z":22.0},"radius":4.0}'
     m_Space: 1
   m_Property:
     name: Sphere

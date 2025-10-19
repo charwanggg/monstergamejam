@@ -27,7 +27,7 @@ public class Exorcist : MonoBehaviour
     [SerializeField] private Animator anim;
     [SerializeField] private Collider attack;
     [SerializeField] private VisualEffect slash;
-    [SerializeField] private AudioSource hitAudio;
+    [SerializeField] private AudioSource walkAudio;
 
     private float nextAttackTime;
     [SerializeField] private float attackCooldown = 1.5f;
@@ -43,13 +43,18 @@ public class Exorcist : MonoBehaviour
 
     void OnTakeDamage(int damage)
     {
+        if (!canSeePlayer())
+        {
+            Die();
+        }
         HitPause.Instance.HitStop(.1f);
-        hitAudio.Play();
+        walkAudio.Play();
     }
 
     void Die()
     {
         isDead = true;
+        Sinner.instance.ExtendDarkMagic(5f);
         StartCoroutine(DieCoroutine());
     }
     IEnumerator DieCoroutine()
@@ -75,12 +80,12 @@ public class Exorcist : MonoBehaviour
         if (currState == State.Chasing)
         {
             agent.SetDestination(Sinner.instance.transform.position);
-            if (!hitAudio.isPlaying) hitAudio.Play();
+            if (!walkAudio.isPlaying) walkAudio.Play();
         }
         else
         {
             agent.SetDestination(currTargetLoc);
-            if (hitAudio.isPlaying) hitAudio.Stop();
+            if (walkAudio.isPlaying) walkAudio.Stop();
         }
 
         if (Sinner.instance != null)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.AI.Navigation;
 using System.Collections;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class MazeMaker : MonoBehaviour
 {
@@ -28,6 +29,8 @@ public class MazeMaker : MonoBehaviour
     private Dictionary<Vector2, GameObject> walls = new Dictionary<Vector2, GameObject>();
     private List<int>[] path;
     private bool[] visited;
+    [SerializeField] private int numRituals;
+    private float pts;
 
     private List<GameObject> enemies;
     void Awake()
@@ -80,7 +83,7 @@ public class MazeMaker : MonoBehaviour
         visited[start] = true;
         DFS(start);
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < numRituals; i++) {
             int r = Random.Range(0, width * length);
             Vector3 ritualPos = GetCellLocation(r);
             RitualPositions.Add(ritualPos);
@@ -93,12 +96,12 @@ public class MazeMaker : MonoBehaviour
         nms.BuildNavMesh();
 
         enemies = new List<GameObject>();
-        for (int i = 0; i < waves[0]; i++)
-        {
-            Vector2Int r = RandomOnEdge();
-            GameObject en = Instantiate(exorcist, GetCellLocation(r.x * length + r.y), Quaternion.identity);
-            enemies.Add(en);
-        }
+        // for (int i = 0; i < waves[0]; i++)
+        // {
+        //     Vector2Int r = RandomOnEdge();
+        //     GameObject en = Instantiate(exorcist, GetCellLocation(r.x * length + r.y), Quaternion.identity);
+        //     enemies.Add(en);
+        // }
     }
 
     private void MakeWall(int a, int b)
@@ -122,6 +125,8 @@ public class MazeMaker : MonoBehaviour
         }
 
     }
+    float nextWave = 0f;
+    float waveTimer = 30f;
     void Update()
     {
         bool isAllNull = true;
@@ -138,51 +143,59 @@ public class MazeMaker : MonoBehaviour
             {
                 enemies = new List<GameObject>();
                 currWave++;
-                if (currWave < waves.Length)
-                {
-                    for (int i = 0; i < waves[currWave]; i++)
-                    {
-                        Vector2Int r = RandomOnEdge();
-                        GameObject en = Instantiate(exorcist, GetCellLocation(r.x * length + r.y), Quaternion.identity);
-                        enemies.Add(en);
-                    }
-                }
-                else
-                {
-                    Win();
-                }
+                SpawnWave(currWave + 2);
+                nextWave = Time.time + waveTimer;
             }
         }
-    }
 
-    void Win()
-    {
-        Debug.Log("YOU WIN");
-        StartCoroutine(WinCoroutine());
-    }
-
-    private IEnumerator WinCoroutine()
-    {
-        Sinner.instance.enabled = false;
-        Sinner.instance.gameObject.GetComponent<PlayerMovement>().enabled = false;
-        Time.timeScale = 0.5f;
-        float time = 0f;
-        loseCanvasGroup.gameObject.SetActive(true);
-        while (time < 1)
+        if (Time.time > nextWave)
         {
-            loseCanvasGroup.alpha = Mathf.Lerp(0f, 1f, time);
-            time += Time.deltaTime;
-            yield return null;
+            currWave++;
+            SpawnWave(currWave + 2);
+            nextWave = Time.time + waveTimer;
         }
-        loseCanvasGroup.alpha = 1f;
+    }
+    
+    void SpawnWave(int num)
+    {
+        for (int i = 0; i < num; i++)
+        {
+            Vector2Int r = RandomOnEdge();
+            GameObject en = Instantiate(exorcist, GetCellLocation(r.x * length + r.y), Quaternion.identity);
+            enemies.Add(en);
+        }
     }
 
+    // void Win()
+    // {
+    //     Debug.Log("YOU WIN");
+    //     StartCoroutine(WinCoroutine());
+    // }
+
+    // private IEnumerator WinCoroutine()
+    // {
+    //     Sinner.instance.enabled = false;
+    //     Sinner.instance.gameObject.GetComponent<PlayerMovement>().enabled = false;
+    //     Time.timeScale = 0.5f;
+    //     float time = 0f;
+    //     loseCanvasGroup.gameObject.SetActive(true);
+    //     while (time < 1)
+    //     {
+    //         loseCanvasGroup.alpha = Mathf.Lerp(0f, 1f, time);
+    //         time += Time.deltaTime;
+    //         yield return null;
+    //     }
+    //     loseCanvasGroup.alpha = 1f;
+    // }
+    public void AddPoints(int p)
+    {
+        pts += p;
+    }
 
     public void Lose()
     {
         Debug.Log("YOU LOSE");
         StartCoroutine(LoseCoroutine());
-        
     }
     
     private IEnumerator LoseCoroutine()
@@ -199,6 +212,7 @@ public class MazeMaker : MonoBehaviour
             yield return null;
         }
         loseCanvasGroup.alpha = 1f;
+        SceneManager.LoadSceneAsync(0);
     }
     private Vector2Int RandomOnEdge()
     {
@@ -208,23 +222,23 @@ public class MazeMaker : MonoBehaviour
         switch (edge)
         {
             case 0: // Top edge
-                x = Random.Range(0, width);
-                y = length - 1;
+                x = Random.Range(1, width - 1);
+                y = length - 2;
                 break;
 
             case 1: // Bottom edge
-                x = Random.Range(0, width);
-                y = 0;
+                x = Random.Range(1, width - 1);
+                y = 1;
                 break;
 
             case 2: // Left edge
-                x = 0;
-                y = Random.Range(0, length);
+                x = 1;
+                y = Random.Range(1, length - 1);
                 break;
 
             case 3: // Right edge
-                x = width - 1;
-                y = Random.Range(0, length);
+                x = width - 2;
+                y = Random.Range(1, length - 1);
                 break;
         }
 

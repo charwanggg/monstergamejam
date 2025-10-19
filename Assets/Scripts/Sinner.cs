@@ -33,6 +33,8 @@ public class Sinner : MonoBehaviour
     [SerializeField] AudioSource takeDmg;
     [SerializeField] AudioSource clawSwipe;
     [SerializeField] AudioSource deathScream;
+    [SerializeField] AudioSource channeling;
+    [SerializeField] VisualEffect darkEnergy;
     void Start()
     {
         foreach (VisualEffect vfx in clawvfx)
@@ -43,6 +45,7 @@ public class Sinner : MonoBehaviour
         hp.OnDie += Die;
         hp.OnTakeDamage += (a) => OnTakeDamage(a);
         lightning.gameObject.SetActive(false);
+        darkEnergy.enabled = false;
     }
 
     void Die()
@@ -54,9 +57,7 @@ public class Sinner : MonoBehaviour
     void OnTakeDamage(int damage)
     {
         HitPause.Instance.HitStop(.1f);
-
         takeDmg.Play();
-
     }
 
     // Update is called once per frame
@@ -79,18 +80,25 @@ public class Sinner : MonoBehaviour
                     rightArmAnim.SetTrigger("Channeling");
                     channelCoroutine = StartCoroutine(ChannelingCoroutine());
                     break;
-                } else
+                }
+                else
                 {
                     Debug.Log("Ritual Exhausted");
                 }
             }
-            
+
         }
         if (Time.time > darkMagicEndTime && darkMagicActive)
         {
             darkMagicActive = false;
+            darkEnergy.Stop();
             Debug.Log("Dark Magic Ended");
         }
+    }
+    
+    public void ExtendDarkMagic(float f)
+    {
+        darkMagicEndTime += f;
     }
 
     void ClawAttack()
@@ -103,6 +111,7 @@ public class Sinner : MonoBehaviour
     {
         float currTime = 0f;
         RitualSpot ritual = null;
+        channeling.Play();
         while (currTime < 1.5f)
         {
             Collider[] hits = Physics.OverlapSphere(transform.position, 3f, ritualLayer);
@@ -132,9 +141,11 @@ public class Sinner : MonoBehaviour
                 leftArmAnim.SetTrigger("BackToIdle");
                 rightArmAnim.SetTrigger("BackToIdle");
                 channelCoroutine = null;
+                channeling.Stop();
                 yield break;
             }
         }
+        
         lightning.gameObject.SetActive(true);
         lightning.Play();
         Debug.Log("Ritual complete");
@@ -143,6 +154,8 @@ public class Sinner : MonoBehaviour
         channelCoroutine = null;
         darkMagicActive = true;
         darkMagicEndTime = Time.time + 10f;
+        darkEnergy.enabled = true;
+        darkEnergy.Play();
         yield return null;
     }
     

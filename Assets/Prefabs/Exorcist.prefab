@@ -508,7 +508,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: -1372625422
   m_Radius: 0.5
-  m_Speed: 1
+  m_Speed: 2
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -542,7 +542,7 @@ MonoBehaviour:
   anim: {fileID: 8792516613852421481}
   attack: {fileID: 4129310314285178403}
   slash: {fileID: 6020796771366106722}
-  hitAudio: {fileID: 0}
+  walkAudio: {fileID: 417788964716887094}
   attackCooldown: 1.5
 --- !u!82 &417788964716887094
 AudioSource:
