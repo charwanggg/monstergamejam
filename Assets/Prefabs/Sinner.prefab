@@ -102,6 +102,9 @@ MonoBehaviour:
   clawCollider: {fileID: 3276066255560282319}
   lightning: {fileID: 3198969273018371869}
   hp: {fileID: 2649305773779333695}
+  ritualLayer:
+    serializedVersion: 2
+    m_Bits: 256
   canChannel: 0
   clawCD: 2
 --- !u!114 &2649305773779333695
@@ -194,7 +197,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 119
+    m_Bits: 375
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0

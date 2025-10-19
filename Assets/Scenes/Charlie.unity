@@ -1120,7 +1120,8 @@ PrefabInstance:
       value: Claw Attack HitBox
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 6435805922942033720, guid: bd8355d1e2d761d4588d210a7d5f3248, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bd8355d1e2d761d4588d210a7d5f3248, type: 3}

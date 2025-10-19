@@ -21,6 +21,7 @@ public class Sinner : MonoBehaviour
     [SerializeField] private Collider clawCollider;
     [SerializeField] private ParticleSystem lightning;
     [SerializeField] private HP hp;
+    [SerializeField] private LayerMask ritualLayer;
     public bool canChannel;
 
 
@@ -63,12 +64,24 @@ public class Sinner : MonoBehaviour
             nextClawAttack = Time.time + clawCD;
             ClawAttack();
         }
-        if (Input.GetMouseButton(1) && canChannel && channelCoroutine == null)
+        if (Input.GetMouseButton(1) && channelCoroutine == null)
         {
-            Debug.Log("Starting Channel");
-            leftArmAnim.SetTrigger("Channeling");
-            rightArmAnim.SetTrigger("Channeling");
-            channelCoroutine = StartCoroutine(ChannelingCoroutine());
+            Collider[] hits = Physics.OverlapSphere(transform.position, 3f, ritualLayer);
+            foreach (Collider hit in hits)
+            {
+                RitualSpot ritual = hit.GetComponentInParent<RitualSpot>();
+                if (!ritual.isExhausted)
+                {
+                    leftArmAnim.SetTrigger("Channeling");
+                    rightArmAnim.SetTrigger("Channeling");
+                    channelCoroutine = StartCoroutine(ChannelingCoroutine());
+                    break;
+                } else
+                {
+                    Debug.Log("Ritual Exhausted");
+                }
+            }
+            
         }
         if (Time.time > darkMagicEndTime && darkMagicActive)
         {
@@ -86,9 +99,23 @@ public class Sinner : MonoBehaviour
     private IEnumerator ChannelingCoroutine()
     {
         float currTime = 0f;
-        
+        RitualSpot ritual = null;
         while (currTime < 1.5f)
         {
+            Collider[] hits = Physics.OverlapSphere(transform.position, 1f, ritualLayer);
+            canChannel = false;
+            foreach (Collider hit in hits)
+            {
+                ritual = hit.GetComponentInParent<RitualSpot>();
+                if (!ritual.isExhausted)
+                {
+                    canChannel = true;
+                    break;
+                } else
+                {
+                    Debug.Log("Ritual Exhausted");
+                }
+            }
             if (canChannel && Input.GetMouseButton(1))
             {
                 yield return new WaitForSeconds(0.1f);
@@ -105,9 +132,11 @@ public class Sinner : MonoBehaviour
         }
         lightning.Play();
         Debug.Log("Ritual complete");
+        ritual.ExhaustRitual();
+
         channelCoroutine = null;
         darkMagicActive = true;
-        darkMagicEndTime = Time.time + 30f;
+        darkMagicEndTime = Time.time + 10f;
         yield return null;
     }
     
