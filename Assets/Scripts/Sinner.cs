@@ -32,6 +32,7 @@ public class Sinner : MonoBehaviour
     [SerializeField] private float clawCD;
     [SerializeField] AudioSource takeDmg;
     [SerializeField] AudioSource clawSwipe;
+    [SerializeField] AudioSource deathScream;
     void Start()
     {
         foreach (VisualEffect vfx in clawvfx)
@@ -45,7 +46,7 @@ public class Sinner : MonoBehaviour
 
     void Die()
     {
-
+        deathScream.Play();
     }
     
     void OnTakeDamage(int damage)
