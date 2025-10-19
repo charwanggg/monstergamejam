@@ -98,7 +98,6 @@ public class MazeMaker : MonoBehaviour
     {
         yield return new WaitForEndOfFrame();
         nms.BuildNavMesh();
-
         enemies = new List<GameObject>();
         // for (int i = 0; i < waves[0]; i++)
         // {
@@ -185,6 +184,8 @@ public class MazeMaker : MonoBehaviour
 
     private IEnumerator LoseCoroutine()
     {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
         Sinner.instance.enabled = false;
         Sinner.instance.gameObject.GetComponent<PlayerMovement>().enabled = false;
         Time.timeScale = 0.5f;
