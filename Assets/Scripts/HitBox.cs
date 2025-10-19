@@ -15,7 +15,7 @@ public class HitBox : MonoBehaviour
     }
     void OnTriggerEnter(Collider other)
     {
-        
+        Debug.Log("Hitbox triggered on " + other.gameObject.name);
         if (other.TryGetComponent<HP>(out HP health) && other.gameObject != owner)
         {
             health.TakeDamage(damageAmount);
