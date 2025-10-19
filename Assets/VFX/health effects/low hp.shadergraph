@@ -127,6 +127,20 @@
         {
             "m_OutputSlot": {
                 "m_Node": {
+                    "m_Id": "088417dc269c4ce6912d0413c7c36229"
+                },
+                "m_SlotId": 3
+            },
+            "m_InputSlot": {
+                "m_Node": {
+                    "m_Id": "e9def834ab2145dca25823896664802c"
+                },
+                "m_SlotId": 0
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
                     "m_Id": "13bdf19ddc9841559813828b551352e9"
                 },
                 "m_SlotId": 2
@@ -846,7 +860,7 @@
     "m_ObjectId": "160fef4fd1ce4857a92f735a122fd964",
     "m_Version": 0,
     "m_fullscreenMode": 0,
-    "m_BlendMode": 0,
+    "m_BlendMode": 1,
     "m_SrcColorBlendMode": 0,
     "m_DstColorBlendMode": 1,
     "m_ColorBlendOperation": 0,
@@ -3068,7 +3082,7 @@
     "m_ObjectId": "eb97c7733b4f45db80b9c7b3e7b5df43",
     "m_Title": "vignette",
     "m_Position": {
-        "x": -1738.499755859375,
+        "x": -1738.4998779296875,
         "y": -1061.5
     }
 }
