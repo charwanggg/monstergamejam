@@ -9,7 +9,7 @@ public class HP : MonoBehaviour
     public int currHP { get; private set; }
     void Start()
     {
-        
+        currHP = maxHealth;
     }
 
     // Update is called once per frame

@@ -6,19 +6,26 @@ using System.Collections;
 public class MazeMaker : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    [SerializeField] private int width = 10;
-    [SerializeField] private int length = 10;
+    private static MazeMaker instance;
+    public static MazeMaker Instance { get { return instance; } }
+    
+    public int width = 10;
+    public int length = 10;
     [SerializeField] private float cellSize = 4f;
     [SerializeField] private float density = 0.2f;
     [SerializeField] private Transform topLeft;
     [SerializeField] private GameObject wallPrefab;
     [SerializeField] private NavMeshSurface nms;
+    [SerializeField] private GameObject Ritual;
+    public List<Vector3> RitualPositions = new List<Vector3>();
     private List<int>[] adjacency;
     private Dictionary<Vector2, GameObject> walls = new Dictionary<Vector2, GameObject>();
-    private List<int>[] path; 
+    private List<int>[] path;
     private bool[] visited;
-
-
+    void Awake()
+    {
+        instance = this;
+    } 
     void Start()
     {
         adjacency = new List<int>[width * length];
@@ -65,6 +72,12 @@ public class MazeMaker : MonoBehaviour
         visited[start] = true;
         DFS(start);
 
+        for (int i = 0; i < 5; i++) {
+            int r = Random.Range(0, width * length);
+            Vector3 ritualPos = GetCellLocation(r);
+            RitualPositions.Add(ritualPos);
+            Instantiate(Ritual, ritualPos + new Vector3(0f, 0.5f, 0f), Quaternion.identity);
+        }
         StartCoroutine(startNavMeshBake());
     }
     private IEnumerator startNavMeshBake() {
@@ -98,7 +111,7 @@ public class MazeMaker : MonoBehaviour
         } 
     }
 
-    private Vector3 GetCellLocation(int ind) {
+    public Vector3 GetCellLocation(int ind) {
         int i = ind / length;
         int j = ind % length;
         float x = topLeft.position.x + cellSize * i;

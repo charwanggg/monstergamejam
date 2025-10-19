@@ -1,4 +1,5 @@
 using System.Collections;
+using NUnit.Framework;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -7,15 +8,25 @@ using UnityEngine.VFX;
 public class Sinner : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public static Sinner instance;
+    void Awake()
+    {
+        instance = this;
+    }
+    
     [SerializeField] private VisualEffect[] clawvfx;
     private bool darkMagicActive;
-    private bool canDarkMagic;
     [SerializeField] private Animator leftArmAnim;
     [SerializeField] private Animator rightArmAnim;
     [SerializeField] private Collider clawCollider;
+    [SerializeField] private ParticleSystem lightning;
     public bool canChannel;
 
+
+    private Coroutine channelCoroutine;
+
     private float nextClawAttack;
+    private float darkMagicEndTime;
     [SerializeField] private float clawCD;
     void Start()
     {
@@ -29,14 +40,22 @@ public class Sinner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) && Time.time >= nextClawAttack)
+        if (Input.GetMouseButtonDown(0) && Time.time >= nextClawAttack && darkMagicActive)
         {
             nextClawAttack = Time.time + clawCD;
             ClawAttack();
         }
-        if (Input.GetMouseButton(1) && canChannel)
+        if (Input.GetMouseButton(1) && canChannel && channelCoroutine == null)
         {
-            StartCoroutine(ChannelingCoroutine());
+            Debug.Log("Starting Channel");
+            leftArmAnim.SetTrigger("Channeling");
+            rightArmAnim.SetTrigger("Channeling");
+            channelCoroutine = StartCoroutine(ChannelingCoroutine());
+        }
+        if (Time.time > darkMagicEndTime && darkMagicActive)
+        {
+            darkMagicActive = false;
+            Debug.Log("Dark Magic Ended");
         }
     }
 
@@ -49,9 +68,8 @@ public class Sinner : MonoBehaviour
     private IEnumerator ChannelingCoroutine()
     {
         float currTime = 0f;
-        leftArmAnim.SetBool("Channeling", true);
-        rightArmAnim.SetBool("Channeling", true);
-        while (currTime < 3f)
+        
+        while (currTime < 2f)
         {
             if (canChannel && Input.GetMouseButton(1))
             {
@@ -60,12 +78,18 @@ public class Sinner : MonoBehaviour
             }
             else
             {
-                leftArmAnim.SetBool("Channeling", false);
-                rightArmAnim.SetBool("Channeling", false);
+                Debug.Log("Channel Interrupted");
+                leftArmAnim.SetTrigger("backToIdle");
+                rightArmAnim.SetTrigger("backToIdle");
+                channelCoroutine = null;
                 yield break;
             }
         }
-        
+        lightning.Play();
+        Debug.Log("Ritual complete");
+        channelCoroutine = null;
+        darkMagicActive = true;
+        darkMagicEndTime = Time.time + 30f;
         yield return null;
     }
     

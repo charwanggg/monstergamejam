@@ -18,7 +18,6 @@ public class RitualDetector : MonoBehaviour
     }
     void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Trigger Entered" + other.gameObject.tag);
         if (other.tag == "Ritual")
         {
             Debug.Log("Ritual Detected");
@@ -31,7 +30,6 @@ public class RitualDetector : MonoBehaviour
     {
         if (other.tag == "Ritual")
         {
-            Debug.Log("Ritual Left");
             ritualsInRange.Remove(other.gameObject);
         }
         if (ritualsInRange.Count == 0)
