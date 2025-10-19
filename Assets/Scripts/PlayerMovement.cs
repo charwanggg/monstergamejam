@@ -9,6 +9,7 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] private float gravity = -20f;
     [SerializeField] private Transform cameraTransform;
+    [SerializeField] AudioSource footsteps;
 
     private CharacterController controller;
     private Vector3 velocity;
@@ -19,6 +20,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector2 currentMouseDelta;
     private Vector2 currentMouseDeltaVelocity;
+    private bool movingLastFrame = false;
 
     void Start()
     {
@@ -34,9 +36,9 @@ public class PlayerMovement : MonoBehaviour
         );
 
         currentMouseDelta = Vector2.SmoothDamp(
-            currentMouseDelta, 
-            targetMouseDelta, 
-            ref currentMouseDeltaVelocity, 
+            currentMouseDelta,
+            targetMouseDelta,
+            ref currentMouseDeltaVelocity,
             smoothTime
         );
 
@@ -66,5 +68,20 @@ public class PlayerMovement : MonoBehaviour
         }
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+
+        if(move.magnitude >= 0.001 && !movingLastFrame)
+        {
+            footsteps.Play();
+            Debug.Log("playing footsteps");
+        }else if(move.magnitude <= 0.001 && movingLastFrame)
+        {
+            footsteps.Stop();
+            Debug.Log("stop footsteps");
+        }
+        if (move.magnitude <= 0.001) movingLastFrame = false;
+        else movingLastFrame = true;
+
+        
+
     }
 }

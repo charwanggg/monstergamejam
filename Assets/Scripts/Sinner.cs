@@ -29,6 +29,8 @@ public class Sinner : MonoBehaviour
     private float nextClawAttack;
     private float darkMagicEndTime;
     [SerializeField] private float clawCD;
+    [SerializeField] AudioSource takeDmg;
+    [SerializeField] AudioSource clawSwipe;
     void Start()
     {
         foreach (VisualEffect vfx in clawvfx)
@@ -48,6 +50,9 @@ public class Sinner : MonoBehaviour
     void OnTakeDamage(int damage)
     {
         HitPause.Instance.HitStop(.1f);
+
+        takeDmg.Play();
+
     }
 
     // Update is called once per frame
@@ -114,6 +119,7 @@ public class Sinner : MonoBehaviour
             vfx.enabled = true;
             vfx.Play();
         }
+        clawSwipe.Play();
         clawCollider.enabled = true;
         yield return new WaitForSeconds(0.8f);
         foreach (VisualEffect vfx in clawvfx)
