@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 74121275046450097}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.377819, y: 0.08, z: 6.984001}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -44,7 +44,8 @@ GameObject:
   - component: {fileID: 2373581615987072850}
   - component: {fileID: 4098189723833439893}
   - component: {fileID: 1321173217250863389}
-  m_Layer: 0
+  - component: {fileID: 3157476370992973289}
+  m_Layer: 8
   m_Name: Ball
   m_TagString: Ritual
   m_Icon: {fileID: 0}
@@ -140,3 +141,17 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3157476370992973289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5997929864554336355}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 075d3c310c298d94d8ba353ea78911a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isExhausted: 0
+  cooldown: 60
