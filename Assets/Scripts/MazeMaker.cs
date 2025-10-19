@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
 using System.Collections;
+using System.Linq;
 
 public class MazeMaker : MonoBehaviour
 {
@@ -17,11 +18,18 @@ public class MazeMaker : MonoBehaviour
     [SerializeField] private GameObject[] wallPrefabs;
     [SerializeField] private NavMeshSurface nms;
     [SerializeField] private GameObject Ritual;
+    [SerializeField] private int[] waves;
+    [SerializeField] private GameObject exorcist;
+    [SerializeField] private CanvasGroup loseCanvasGroup;
+    [SerializeField] private CanvasGroup winCanvasGroup;
+    private int currWave;
     public List<Vector3> RitualPositions = new List<Vector3>();
     private List<int>[] adjacency;
     private Dictionary<Vector2, GameObject> walls = new Dictionary<Vector2, GameObject>();
     private List<int>[] path;
     private bool[] visited;
+
+    private List<GameObject> enemies;
     void Awake()
     {
         instance = this;
@@ -83,11 +91,21 @@ public class MazeMaker : MonoBehaviour
     private IEnumerator startNavMeshBake() {
         yield return new WaitForEndOfFrame();
         nms.BuildNavMesh();
+
+        enemies = new List<GameObject>();
+        for (int i = 0; i < waves[0]; i++)
+        {
+            Vector2Int r = RandomOnEdge();
+            GameObject en = Instantiate(exorcist, GetCellLocation(r.x * length + r.y), Quaternion.identity);
+            enemies.Add(en);
+        }
     }
 
-    private void MakeWall(int a, int b) {
+    private void MakeWall(int a, int b)
+    {
         float f = Random.Range(0f, 1f);
-        if (f > density) {
+        if (f > density)
+        {
             return;
         }
         Vector3 cellA = GetCellLocation(a);
@@ -96,12 +114,121 @@ public class MazeMaker : MonoBehaviour
         Vector3 direction = (cellB - cellA).normalized;
         Quaternion wallRot = Quaternion.LookRotation(direction);
         Vector2 v = new Vector2(Mathf.Max(a, b), Mathf.Min(a, b));
+
         if (!walls.ContainsKey(v)) {
             GameObject wallPrefab = wallPrefabs[Random.Range(0, wallPrefabs.Length - 1)];
             GameObject wall = Instantiate(wallPrefab, wallPos, wallRot, this.transform);
             walls.Add(v, wall);
         }
+
+    }
+    void Update()
+    {
+        bool isAllNull = true;
+        if (enemies != null)
+        {
+            foreach (GameObject g in enemies)
+            {
+                if (g != null)
+                {
+                    isAllNull = false;
+                }
+            }
+            if (isAllNull)
+            {
+                enemies = new List<GameObject>();
+                currWave++;
+                if (currWave < waves.Length)
+                {
+                    for (int i = 0; i < waves[currWave]; i++)
+                    {
+                        Vector2Int r = RandomOnEdge();
+                        GameObject en = Instantiate(exorcist, GetCellLocation(r.x * length + r.y), Quaternion.identity);
+                        enemies.Add(en);
+                    }
+                }
+                else
+                {
+                    Win();
+                }
+            }
+        }
+    }
+
+    void Win()
+    {
+        Debug.Log("YOU WIN");
+        StartCoroutine(WinCoroutine());
+    }
+
+    private IEnumerator WinCoroutine()
+    {
+        Sinner.instance.enabled = false;
+        Sinner.instance.gameObject.GetComponent<PlayerMovement>().enabled = false;
+        Time.timeScale = 0.5f;
+        float time = 0f;
+        loseCanvasGroup.gameObject.SetActive(true);
+        while (time < 1)
+        {
+            loseCanvasGroup.alpha = Mathf.Lerp(0f, 1f, time);
+            time += Time.deltaTime;
+            yield return null;
+        }
+        loseCanvasGroup.alpha = 1f;
+    }
+
+
+    public void Lose()
+    {
+        Debug.Log("YOU LOSE");
+        StartCoroutine(LoseCoroutine());
         
+    }
+    
+    private IEnumerator LoseCoroutine()
+    {
+        Sinner.instance.enabled = false;
+        Sinner.instance.gameObject.GetComponent<PlayerMovement>().enabled = false;
+        Time.timeScale = 0.5f;
+        float time = 0f;
+        loseCanvasGroup.gameObject.SetActive(true);
+        while (time < 1)
+        {
+            loseCanvasGroup.alpha = Mathf.Lerp(0f, 1f, time);
+            time += Time.deltaTime;
+            yield return null;
+        }
+        loseCanvasGroup.alpha = 1f;
+    }
+    private Vector2Int RandomOnEdge()
+    {
+        int edge = Random.Range(0, 4); // 0=Top, 1=Bottom, 2=Left, 3=Right
+        int x = 0, y = 0;
+
+        switch (edge)
+        {
+            case 0: // Top edge
+                x = Random.Range(0, width);
+                y = length - 1;
+                break;
+
+            case 1: // Bottom edge
+                x = Random.Range(0, width);
+                y = 0;
+                break;
+
+            case 2: // Left edge
+                x = 0;
+                y = Random.Range(0, length);
+                break;
+
+            case 3: // Right edge
+                x = width - 1;
+                y = Random.Range(0, length);
+                break;
+        }
+
+        return new Vector2Int(x, y);
     }
 
     private void RemoveWall(int a, int b) {

@@ -41,11 +41,13 @@ public class Sinner : MonoBehaviour
         }
         clawCollider.GetComponent<HitBox>().owner = this.gameObject;
         hp.OnDie += Die;
-        hp.OnTakeDamage +=(a) => OnTakeDamage(a);
+        hp.OnTakeDamage += (a) => OnTakeDamage(a);
+        lightning.gameObject.SetActive(false);
     }
 
     void Die()
     {
+        MazeMaker.Instance.Lose();
         deathScream.Play();
     }
     
@@ -103,16 +105,18 @@ public class Sinner : MonoBehaviour
         RitualSpot ritual = null;
         while (currTime < 1.5f)
         {
-            Collider[] hits = Physics.OverlapSphere(transform.position, 1f, ritualLayer);
+            Collider[] hits = Physics.OverlapSphere(transform.position, 3f, ritualLayer);
             canChannel = false;
             foreach (Collider hit in hits)
             {
+                Debug.Log("Collider hit" + hit.gameObject.name);
                 ritual = hit.GetComponentInParent<RitualSpot>();
                 if (!ritual.isExhausted)
                 {
                     canChannel = true;
                     break;
-                } else
+                }
+                else
                 {
                     Debug.Log("Ritual Exhausted");
                 }
@@ -131,6 +135,7 @@ public class Sinner : MonoBehaviour
                 yield break;
             }
         }
+        lightning.gameObject.SetActive(true);
         lightning.Play();
         Debug.Log("Ritual complete");
         ritual.ExhaustRitual();
