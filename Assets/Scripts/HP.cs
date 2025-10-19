@@ -22,7 +22,7 @@ public class HP : MonoBehaviour
     {
         OnTakeDamage?.Invoke(damage);
         currHP -= damage;
-        Debug.Log("TOOK DAMAGE");
+        Debug.Log(this.gameObject.name + "TOOK DAMAGE" + damage + " CURRENT HP: " + currHP);
         if (currHP <= 0)
         {
             Die();

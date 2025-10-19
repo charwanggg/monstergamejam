@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.AI.Navigation;
+using System.Collections;
 
 public class MazeMaker : MonoBehaviour
 {
@@ -7,9 +9,10 @@ public class MazeMaker : MonoBehaviour
     [SerializeField] private int width = 10;
     [SerializeField] private int length = 10;
     [SerializeField] private float cellSize = 4f;
+    [SerializeField] private float density = 0.2f;
     [SerializeField] private Transform topLeft;
-
     [SerializeField] private GameObject wallPrefab;
+    [SerializeField] private NavMeshSurface nms;
     private List<int>[] adjacency;
     private Dictionary<Vector2, GameObject> walls = new Dictionary<Vector2, GameObject>();
     private List<int>[] path; 
@@ -21,30 +24,37 @@ public class MazeMaker : MonoBehaviour
         adjacency = new List<int>[width * length];
         path = new List<int>[width * length];
         visited = new bool[width * length];
-        
-        for (int i = 0; i < width * length; i++) {
+
+        for (int i = 0; i < width * length; i++)
+        {
             adjacency[i] = new List<int>();
             path[i] = new List<int>();
         }
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < length; j++) {
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < length; j++)
+            {
                 int a = i * length + j;
-                if (i > 0) {
+                if (i > 0)
+                {
                     int b = (i - 1) * length + j;
                     adjacency[a].Add(b);
                     MakeWall(a, b);
                 }
-                if (j > 0) {
+                if (j > 0)
+                {
                     int b = a - 1;
                     adjacency[a].Add(b);
                     MakeWall(a, b);
                 }
-                if (i < width - 1) {
+                if (i < width - 1)
+                {
                     int b = (i + 1) * length + j;
                     adjacency[a].Add(b);
                     MakeWall(a, b);
                 }
-                if (j < length - 1) {
+                if (j < length - 1)
+                {
                     int b = a + 1;
                     adjacency[a].Add(b);
                     MakeWall(a, b);
@@ -54,9 +64,19 @@ public class MazeMaker : MonoBehaviour
         int start = Random.Range(0, width * length);
         visited[start] = true;
         DFS(start);
+
+        StartCoroutine(startNavMeshBake());
+    }
+    private IEnumerator startNavMeshBake() {
+        yield return new WaitForEndOfFrame();
+        nms.BuildNavMesh();
     }
 
     private void MakeWall(int a, int b) {
+        float f = Random.Range(0f, 1f);
+        if (f > density) {
+            return;
+        }
         Vector3 cellA = GetCellLocation(a);
         Vector3 cellB = GetCellLocation(b);
         Vector3 wallPos = (cellA + cellB) / 2;
