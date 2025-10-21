@@ -5,6 +5,7 @@ using System.Collections;
 using System.Linq;
 using UnityEngine.SceneManagement;
 using TMPro;
+using UnityEngine.UI;
 
 public class MazeMaker : MonoBehaviour
 {
@@ -15,7 +16,7 @@ public class MazeMaker : MonoBehaviour
     public int width = 10;
     public int length = 10;
     [SerializeField] private float cellSize = 4f;
-    [SerializeField] private float density = 0.2f;
+    [SerializeField] private float density;
     [SerializeField] private Transform topLeft;
     [SerializeField] private GameObject[] wallPrefabs;
     [SerializeField] private NavMeshSurface nms;
@@ -24,6 +25,8 @@ public class MazeMaker : MonoBehaviour
     [SerializeField] private GameObject exorcist;
     [SerializeField] private CanvasGroup loseCanvasGroup;
     [SerializeField] private CanvasGroup winCanvasGroup;
+    [SerializeField] private Button backToHome;
+    private bool isGoBack;
     private int currWave;
     public List<Vector3> RitualPositions = new List<Vector3>();
     private List<int>[] adjacency;
@@ -39,8 +42,13 @@ public class MazeMaker : MonoBehaviour
     {
         instance = this;
     }
+   
     void Start()
     {
+        isGoBack = false;
+        backToHome.onClick.AddListener(GoHome);
+        enemies = new List<GameObject>();
+        density = Random.Range(0.3f, 0.6f);
         adjacency = new List<int>[width * length];
         path = new List<int>[width * length];
         visited = new bool[width * length];
@@ -98,7 +106,7 @@ public class MazeMaker : MonoBehaviour
     {
         yield return new WaitForEndOfFrame();
         nms.BuildNavMesh();
-        enemies = new List<GameObject>();
+        SpawnWave(0);
         // for (int i = 0; i < waves[0]; i++)
         // {
         //     Vector2Int r = RandomOnEdge();
@@ -129,7 +137,7 @@ public class MazeMaker : MonoBehaviour
         }
 
     }
-    float nextWave = 0f;
+    float nextWave = 20f;
     float waveTimer = 30f;
     void Update()
     {
@@ -177,9 +185,8 @@ public class MazeMaker : MonoBehaviour
 
     public void Lose()
     {
-        Debug.Log("YOU LOSE");
+        //Debug.Log("YOU LOSE");
         StartCoroutine(LoseCoroutine());
-        
     }
 
     private IEnumerator LoseCoroutine()
@@ -187,9 +194,9 @@ public class MazeMaker : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         Sinner.instance.enabled = false;
+        Sinner.instance.gameObject.GetComponent<PlayerMovement>().footsteps.Stop();
         Sinner.instance.gameObject.GetComponent<PlayerMovement>().enabled = false;
-        Time.timeScale = 0.5f;
-        scoreText.text = "Score: " + ((int) pts); 
+        scoreText.text = "Score: " + ((int)pts);
         float time = 0f;
         loseCanvasGroup.gameObject.SetActive(true);
         while (time < 1)
@@ -199,7 +206,17 @@ public class MazeMaker : MonoBehaviour
             yield return null;
         }
         loseCanvasGroup.alpha = 1f;
-        SceneManager.LoadSceneAsync("menu");
+        while (Time.timeScale > 0.1)
+        {
+            Time.timeScale -= Time.unscaledDeltaTime;
+            yield return new WaitForEndOfFrame();
+        }
+        Time.timeScale = 0f;
+    }
+
+    void GoHome()
+    {
+        SceneManager.LoadScene("menu");
     }
     private Vector2Int RandomOnEdge()
     {

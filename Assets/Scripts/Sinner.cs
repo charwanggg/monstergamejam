@@ -35,29 +35,34 @@ public class Sinner : MonoBehaviour
     [SerializeField] AudioSource deathScream;
     [SerializeField] AudioSource channeling;
     [SerializeField] VisualEffect darkEnergy;
+    private PlayerMovement pm;
     void Start()
     {
         foreach (VisualEffect vfx in clawvfx)
         {
             vfx.enabled = false;
         }
+        pm = this.gameObject.GetComponent<PlayerMovement>();
         clawCollider.GetComponent<HitBox>().owner = this.gameObject;
         hp.OnDie += Die;
-        hp.OnTakeDamage += (a) => OnTakeDamage(a);
+        hp.OnTakeDamage += (a, g) => OnTakeDamage(a, g);
         lightning.gameObject.SetActive(false);
         darkEnergy.enabled = false;
     }
 
     void Die()
     {
-        MazeMaker.Instance.Lose();
+        darkEnergy.Stop();
         deathScream.Play();
+
+        MazeMaker.Instance.Lose();
     }
     
-    void OnTakeDamage(int damage)
+    void OnTakeDamage(int damage, GameObject g)
     {
         HitPause.Instance.HitStop(.1f);
         takeDmg.Play();
+        pm.ApplyKnockback(this.transform.position - g.transform.position, 13f);
     }
 
     // Update is called once per frame
@@ -81,10 +86,6 @@ public class Sinner : MonoBehaviour
                     channelCoroutine = StartCoroutine(ChannelingCoroutine());
                     break;
                 }
-                else
-                {
-                    Debug.Log("Ritual Exhausted");
-                }
             }
 
         }
@@ -92,7 +93,6 @@ public class Sinner : MonoBehaviour
         {
             darkMagicActive = false;
             darkEnergy.Stop();
-            Debug.Log("Dark Magic Ended");
         }
     }
     
@@ -169,12 +169,14 @@ public class Sinner : MonoBehaviour
         }
         clawSwipe.Play();
         clawCollider.enabled = true;
-        yield return new WaitForSeconds(0.8f);
+        yield return new WaitForSeconds(0.3f);
+        clawCollider.enabled = false;
+        yield return new WaitForSeconds(0.5f);
         foreach (VisualEffect vfx in clawvfx)
         {
             vfx.Stop();
             vfx.enabled = false;
         }
-        clawCollider.enabled = false;
+        
     }
 }

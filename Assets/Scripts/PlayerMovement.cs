@@ -9,18 +9,19 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] private float gravity = -20f;
     [SerializeField] private Transform cameraTransform;
-    [SerializeField] AudioSource footsteps;
+    public AudioSource footsteps;
 
     private CharacterController controller;
     private Vector3 velocity;
     private bool isGrounded;
     private float xRotation = 0f;
 
-    private float smoothTime = 0.05f;
-
     private Vector2 currentMouseDelta;
     private Vector2 currentMouseDeltaVelocity;
     private bool movingLastFrame = false;
+
+    private Vector3 knockbackVelocity = Vector3.zero;
+    private float knockbackDecay = 5f;
 
     void Start()
     {
@@ -30,30 +31,18 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        Vector2 targetMouseDelta = new Vector2(
-            Input.GetAxisRaw("Mouse X"),
-            Input.GetAxisRaw("Mouse Y")
-        );
-
-        currentMouseDelta = Vector2.SmoothDamp(
-            currentMouseDelta,
-            targetMouseDelta,
-            ref currentMouseDeltaVelocity,
-            smoothTime
-        );
-
-        float mouseX = currentMouseDelta.x * mouseSensitivity * Time.deltaTime;
-        float mouseY = currentMouseDelta.y * mouseSensitivity * 2 * Time.deltaTime;
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity / 100f;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity / 100f;
 
         xRotation -= mouseY;
-        xRotation = Mathf.Clamp(xRotation, -90f, 90f); 
+        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
         cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
         transform.Rotate(Vector3.up * mouseX);
 
         isGrounded = controller.isGrounded;
         if (isGrounded && velocity.y < 0)
         {
-            velocity.y = -2f; 
+            velocity.y = -2f;
         }
 
         float x = Input.GetAxis("Horizontal");
@@ -67,21 +56,26 @@ public class PlayerMovement : MonoBehaviour
             velocity.y = Mathf.Sqrt(jumpForce * -2f * gravity);
         }
         velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
+        controller.Move((velocity + knockbackVelocity) * Time.deltaTime);
 
-        if(move.magnitude >= 0.001 && !movingLastFrame)
+        if (move.magnitude >= 0.001 && !movingLastFrame)
         {
             footsteps.Play();
-            Debug.Log("playing footsteps");
-        }else if(move.magnitude <= 0.001 && movingLastFrame)
+        }
+        else if (move.magnitude <= 0.001 && movingLastFrame)
         {
             footsteps.Stop();
-            Debug.Log("stop footsteps");
         }
         if (move.magnitude <= 0.001) movingLastFrame = false;
-        else movingLastFrame = true;
+        else movingLastFrame = true;        
 
-        
-
+        knockbackVelocity = Vector3.Lerp(knockbackVelocity, Vector3.zero, knockbackDecay * Time.deltaTime);
+    }
+    
+    public void ApplyKnockback(Vector3 direction, float force)
+    {
+        direction.Normalize();
+        direction.y = 1f;
+        knockbackVelocity += direction * force;
     }
 }

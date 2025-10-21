@@ -17,7 +17,7 @@ public class HitBox : MonoBehaviour
     {
         if (other.TryGetComponent<HP>(out HP health) && other.gameObject != owner)
         {
-            health.TakeDamage(damageAmount);
+            health.TakeDamage(damageAmount, owner);
             hitVFX.transform.position = other.gameObject.transform.position;
             hitVFX.enabled = true;
             hitVFX.Play();

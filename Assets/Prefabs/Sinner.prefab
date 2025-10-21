@@ -81,7 +81,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 5
   jumpForce: 2
-  mouseSensitivity: 30
+  mouseSensitivity: 75
   gravity: -30
   cameraTransform: {fileID: 8217565183355351114}
   footsteps: {fileID: 217789655357996830}

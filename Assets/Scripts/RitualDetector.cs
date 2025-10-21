@@ -21,7 +21,6 @@ public class RitualDetector : MonoBehaviour
         if (other.tag == "Ritual")
         {
             RitualSpot ritual = other.GetComponentInParent<RitualSpot>();
-            Debug.Log("Ritual Detected");
             if (!ritual.isExhausted)
             {
                 ritualsInRange.Add(other.gameObject);

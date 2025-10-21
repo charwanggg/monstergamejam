@@ -29,7 +29,7 @@ public class Exorcist : MonoBehaviour
     [SerializeField] private VisualEffect slash;
     [SerializeField] private AudioSource walkAudio;
     [SerializeField] private AudioSource hitAudio;
-
+    [SerializeField] private AudioSource swordAudio;
     private float nextAttackTime;
     [SerializeField] private float attackCooldown = 1.5f;
     private bool isDead = false;
@@ -38,11 +38,11 @@ public class Exorcist : MonoBehaviour
         currState = State.Idle;
         hp.OnDie += Die;
         slash.enabled = false;
-        hp.OnTakeDamage += (a) => OnTakeDamage(a);
+        hp.OnTakeDamage += (d, g) => OnTakeDamage(d, g);
         attack.GetComponent<HitBox>().owner = hp.gameObject;    
     }
 
-    void OnTakeDamage(int damage)
+    void OnTakeDamage(int damage, GameObject g)
     {
         if (!canSeePlayer())
         {
@@ -56,7 +56,8 @@ public class Exorcist : MonoBehaviour
     {
         isDead = true;
         Sinner.instance.ExtendDarkMagic(5f);
-        MazeMaker.Instance.AddPoints(20);
+        MazeMaker.Instance.AddPoints(25);
+        attack.enabled = false;
         StartCoroutine(DieCoroutine());
     }
     IEnumerator DieCoroutine()
@@ -70,6 +71,12 @@ public class Exorcist : MonoBehaviour
     void Update()
     {
         if (isDead) return;
+        if (!Sinner.instance.enabled)
+        {
+            walkAudio.Stop();
+            this.enabled = false;
+            return;
+        }
         if (canSeePlayer())
         {
             OnStateToChasing();
@@ -116,10 +123,12 @@ public class Exorcist : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         slash.enabled = true;
         slash.Play();
+        swordAudio.Play();
         yield return new WaitForSeconds(0.1f);
         attack.enabled = true;
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(0.2f);
         attack.enabled = false;
+        yield return new WaitForSeconds(1.8f);
         slash.Stop();
         slash.enabled = false;
         isAttacking = false;
@@ -144,7 +153,7 @@ public class Exorcist : MonoBehaviour
 
     void OnStateToIdle()
     {
-        Debug.Log(gameObject.name + " to Idle");
+        //Debug.Log(gameObject.name + " to Idle");
         currState = State.Idle;
         int r = Random.Range(0, MazeMaker.Instance.width * MazeMaker.Instance.length);
         currTargetLoc = MazeMaker.Instance.GetCellLocation(r);
@@ -154,7 +163,7 @@ public class Exorcist : MonoBehaviour
 
     void OnStateToChasing()
     {
-        Debug.Log(gameObject.name + " to Chasing");
+        //Debug.Log(gameObject.name + " to Chasing");
         currState = State.Chasing;
         agent.SetDestination(Sinner.instance.transform.position);
         currTargetLoc = Sinner.instance.transform.position;
@@ -163,7 +172,7 @@ public class Exorcist : MonoBehaviour
 
     void OnStateToGuarding()
     {
-        Debug.Log(gameObject.name + " to Guarding");
+        //Debug.Log(gameObject.name + " to Guarding");
         currState = State.Guarding;
         int r = Random.Range(0, MazeMaker.Instance.RitualPositions.Count);
         currTargetLoc = MazeMaker.Instance.RitualPositions[r];

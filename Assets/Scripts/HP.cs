@@ -4,7 +4,7 @@ public class HP : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     [SerializeField] private int maxHealth = 100;
-    public event System.Action<int> OnTakeDamage;
+    public event System.Action<int, GameObject> OnTakeDamage;
     public event System.Action OnDie;
     public int currHP { get; private set; }
     void Start()
@@ -18,11 +18,11 @@ public class HP : MonoBehaviour
 
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage, GameObject g)
     {
-        OnTakeDamage?.Invoke(damage);
+        OnTakeDamage?.Invoke(damage, g);
         currHP -= damage;
-        Debug.Log(this.gameObject.name + "TOOK DAMAGE" + damage + " CURRENT HP: " + currHP);
+        //Debug.Log(this.gameObject.name + "TOOK DAMAGE" + damage + " CURRENT HP: " + currHP);
         if (currHP <= 0)
         {
             Die();
